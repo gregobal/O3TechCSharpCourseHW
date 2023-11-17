@@ -1,0 +1,114 @@
+syntax = "proto3";
+
+option csharp_namespace = "GrpcService";
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/struct.proto";
+import "google/protobuf/wrappers.proto";
+
+package product;
+
+service ProductGrpcService {
+  rpc GetList(GetListRequest) returns (GetListResponse){
+    option (google.api.http) = {
+      get: "/v1/products"
+    };
+  }
+
+  rpc GetById(GetByIdRequest) returns (GetByIdResponse){
+    option (google.api.http) = {
+      get: "/v1/products/{id}"
+    };
+  }
+
+  rpc Create(CreateRequest) returns (CreateResponse){
+    option (google.api.http) = {
+      post: "/v1/products",
+      body:"*"
+    };
+  }
+
+  rpc UpdatePrice(UpdatePriceRequest) returns (UpdatePriceResponse){
+    option (google.api.http) = {
+      put: "/v1/products/{id}",
+      body:"price"
+    };
+  }
+}
+
+message GetListRequest {
+  int32 page = 1;
+  int32 records_per_page = 2;
+  optional google.protobuf.Timestamp date_from = 3;
+  optional google.protobuf.Timestamp date_to = 4;
+  NullableProductCategory category = 5;
+  google.protobuf.Int32Value warehouseId = 6;
+}
+
+message GetListResponse {
+  int32 page = 1;
+  int32 total_pages = 2;
+  repeated ProductModel records = 3;
+}
+
+message GetByIdRequest {
+  int32 id = 1;
+}
+
+message GetByIdResponse {
+  ProductModel product = 1;
+}
+
+message CreateRequest {
+  string name = 2;
+  DecimalValue price = 3;
+  int32 weight = 4;
+  ProductCategory category = 5;
+  int32 warehouseId = 6;
+}
+
+message CreateResponse {
+  ProductModel product = 1;
+}
+
+message UpdatePriceRequest {
+  int32 id = 1;
+  DecimalValue price = 2;
+}
+
+message UpdatePriceResponse {
+  ProductModel product = 1;
+}
+
+message ProductModel {
+  int32 id = 1;
+  string name = 2;
+  DecimalValue price = 3;
+  int32 weight = 4;
+  ProductCategory category = 5;
+  int32 warehouseId = 6;
+  google.protobuf.Timestamp createdAt = 7;
+}
+
+enum ProductCategory {
+  GENERAL = 0;
+  HOUSEHOLD_CHEMICALS = 1;
+  APPLIANCES = 2;
+  FOOD = 3;
+}
+
+message NullableProductCategory {
+  oneof kind {
+    google.protobuf.NullValue none = 1;
+    ProductCategory value = 2;
+  }
+}
+
+message DecimalValue {
+  // Whole units part of the amount
+  int64 units = 1;
+
+  // Nano units of the amount (10^-9)
+  // Must be same sign as units
+  sfixed32 nanos = 2;
+}

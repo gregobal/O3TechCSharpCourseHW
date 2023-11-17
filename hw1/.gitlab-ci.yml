@@ -1,0 +1,25 @@
+image: mcr.microsoft.com/dotnet/sdk:latest
+
+variables:
+  SOURCE_DIR: '.'
+  BINARIES_DIR: 'bin'
+
+stages:
+  - build
+  - test
+
+build:
+  stage: build  
+  script:
+    - echo "BUILDING SOLUTION"
+    - dotnet build
+  artifacts:
+    paths:
+      - $SOURCE_DIR/*/$BINARIES_DIR
+    expire_in: 1 week
+
+test:
+  stage: test
+  script:
+    - echo "TEST"
+    - dotnet test
